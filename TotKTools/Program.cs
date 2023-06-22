@@ -10,22 +10,23 @@ namespace TotKTools
         public static void Main()
         {
 
-            //     var size = (int)(58 * 1 / 0.65f);
+                 var size = (int)(58f * (58f / 40f));
 
-            //     var newIcon = new Icon(size, size);
+                 var newIcon = new Icon(58, 58);
 
-            //   var shadowLayer = newIcon.AddLayer(@"D:\TotK-Sorted\Icons\MapIconImportant.png");
-            //   shadowLayer.Opacity = 150 / 255f;
-            //   shadowLayer.Scale = 1 / 0.65f;
-            // shadowLayer.WhiteColor = new SKColor(0, 0, 0);
-            // shadowLayer.BlackColor = new SKColor(0, 0, 0, 0);
 
-            // var iconLayer = newIcon.AddLayer(@"D:\TotK-Sorted\Icons\MapIconBuildingVillage.png");
+               /*var shadowLayer = newIcon.AddLayer(@"D:\TotK-Sorted\Icons\MapIconImportantShopSh_58x58^s.png");
+               shadowLayer.Opacity = 150 / 255f;
+               shadowLayer.Scale = 58f/40f;
+             shadowLayer.WhiteColor = new SKColor(0, 0, 0);
+             shadowLayer.BlackColor = new SKColor(0, 0, 0, 0);*/
+
+             var iconLayer = newIcon.AddLayer(@"D:\TotK-Sorted\Icons\MapIconBuildingStableInn_58x58^w.png");
             // iconLayer.Scale = 0.65f;
-            // iconLayer.WhiteColor = new SKColor(150, 120, 40);
-            // iconLayer.BlackColor = new SKColor(111, 66, 16);
+             iconLayer.WhiteColor = new SKColor(150, 120, 40);
+             iconLayer.BlackColor = new SKColor(111, 66, 16);
 
-            //  newIcon.Save(@"D:\TotK-Sorted\Icons\HouseIcon.png");
+              newIcon.Save(@"D:\TotK-Sorted\Icons\HouseIcon.png");
 
 
             /*

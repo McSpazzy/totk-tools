@@ -19,9 +19,9 @@ namespace IconBuilder
                     {
                         var pixel = grayScaleImage.GetPixel(x, y);
                         var factor = pixel.Red / 255f;
-                  //      var alpha = (byte)(pixel.Alpha * opacity);
+                        var alpha = (pixel.Alpha * opacity) / 255f;
 
-                        paint.Color = InterpolateColors(black, white, factor, opacity);
+                        paint.Color = InterpolateColors(black, white, factor, alpha);
                         canvas.DrawPoint(x, y, paint);
                     }
                 }
@@ -46,7 +46,8 @@ namespace IconBuilder
                 {
                     var pixel = bitmap.GetPixel(x, y);
                     var factor = pixel.Red / 255f;
-                    paint.Color = InterpolateColors(black, white, factor, opacity);
+                    var alpha = (pixel.Alpha * opacity) / 255f;
+                    paint.Color = InterpolateColors(black, white, factor, alpha);
                     canvas.DrawPoint(x, y, paint);
                 }
             }
