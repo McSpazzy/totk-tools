@@ -1,33 +1,51 @@
 ﻿using BHTMP;
 using IconBuilder;
 using SkiaSharp;
+using CombinedActorInfo;
+using Newtonsoft.Json;
 using ToolLib;
 
 namespace TotKTools
 {
     internal class Program
     {
-        public static void Main()
+
+
+        static void Main(string[] args)
         {
 
-                 var size = (int)(58f * (58f / 40f));
+            var fil = CombinedActorInfoFile.Open(@"D:\TotK-Data\AutoBuild\AutoBuild-20.cbi");
+            var json = JsonConvert.SerializeObject(fil.CombinedActorInfo, Formatting.Indented, new JsonSerializerSettings() {NullValueHandling = NullValueHandling.Ignore});
+            File.WriteAllText(@"d:\testOut.json", json);
 
-                 var newIcon = new Icon(58, 58);
+            var test = CombinedActorInfoFile.FromFile(@"d:\testOut.json"); // Load json after modified or whatever
+            test.Save(@"d:\newFile.cbi");
+
+            // Validation
+            var testInputFile = CombinedActorInfoFile.Open(@"d:\newFile.cbi");
+            var json2 = JsonConvert.SerializeObject(testInputFile.CombinedActorInfo, Formatting.Indented, new JsonSerializerSettings() {NullValueHandling = NullValueHandling.Ignore});
+            File.WriteAllText(@"d:\testOut2.json", json2); // should match the edited json
 
 
-               /*var shadowLayer = newIcon.AddLayer(@"D:\TotK-Sorted\Icons\MapIconImportantShopSh_58x58^s.png");
-               shadowLayer.Opacity = 150 / 255f;
-               shadowLayer.Scale = 58f/40f;
-             shadowLayer.WhiteColor = new SKColor(0, 0, 0);
-             shadowLayer.BlackColor = new SKColor(0, 0, 0, 0);*/
+            return;
 
-             var iconLayer = newIcon.AddLayer(@"D:\TotK-Sorted\Icons\MapIconBuildingStableInn_58x58^w.png");
+
+            //     var newIcon = new Icon(size, size);
+
+            //   var shadowLayer = newIcon.AddLayer(@"D:\TotK-Sorted\Icons\MapIconImportant.png");
+            //   shadowLayer.Opacity = 150 / 255f;
+            //   shadowLayer.Scale = 1 / 0.65f;
+            // shadowLayer.WhiteColor = new SKColor(0, 0, 0);
+            // shadowLayer.BlackColor = new SKColor(0, 0, 0, 0);
+
+            // var iconLayer = newIcon.AddLayer(@"D:\TotK-Sorted\Icons\MapIconBuildingVillage.png");
             // iconLayer.Scale = 0.65f;
-             iconLayer.WhiteColor = new SKColor(150, 120, 40);
-             iconLayer.BlackColor = new SKColor(111, 66, 16);
+            // iconLayer.WhiteColor = new SKColor(150, 120, 40);
+            // iconLayer.BlackColor = new SKColor(111, 66, 16);
 
-              newIcon.Save(@"D:\TotK-Sorted\Icons\HouseIcon.png");
+            //  newIcon.Save(@"D:\TotK-Sorted\Icons\HouseIcon.png");
 
+            // CreateHeightMaps(@"D:\TotK-Sorted\HeightMap-Raw\", @"D:\TotK-Sorted\HeightMaps\");
 
             /*
             var black = new SKColor(0, 0, 255, 0);
@@ -49,7 +67,6 @@ namespace TotKTools
             //     var black = new SKColor(255,140, 30, 0);
             //var white = new SKColor(255, 255, 100, 255);
             // var black = new SKColor(0, 0, 0, 0);
-
 
 
             //var image = ColorReplacer.Load(@"D:\TotK-Sorted\Icons\Light-Circle.png", white, black, 256 / 255f);
@@ -96,4 +113,5 @@ namespace TotKTools
             CreateHeightMap("S", 400, 3200);
         }
     }
+    
 }

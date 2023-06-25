@@ -41,29 +41,95 @@ public static class ToolExt
         return Quaternion.CreateFromRotationMatrix(matrix);
     }
 
-    public static Vector3 ToVector3(this Quaternion quaternion)
+    public static Matrix4x4 ToMatrix(this Quaternion quaternion)
     {
-        float pitch;
+        return Matrix4x4.CreateFromQuaternion(quaternion);
+    }
 
-        double sinr_cosp = 2 * (quaternion.W * quaternion.X + quaternion.Y * quaternion.Z);
-        double cosr_cosp = 1 - 2 * (quaternion.X * quaternion.X + quaternion.Y * quaternion.Y);
-        var roll = (float)((float)Math.Atan2(sinr_cosp, cosr_cosp) * 180f / Math.PI);
+    public static Quaternion ToQuaternion(this Vector3 v)
+    {
+        v.X /= (float)(180f / Math.PI);
+        v.Y /= (float)(180f / Math.PI);
+        v.Z /= (float)(180f / Math.PI);
+        
+        float cy = (float)Math.Cos(v.Z * 0.5);
+        float sy = (float)Math.Sin(v.Z * 0.5);
+        float cp = (float)Math.Cos(v.Y * 0.5);
+        float sp = (float)Math.Sin(v.Y * 0.5);
+        float cr = (float)Math.Cos(v.X * 0.5);
+        float sr = (float)Math.Sin(v.X * 0.5);
 
-        double sinp = 2 * (quaternion.W * quaternion.Y - quaternion.Z * quaternion.X);
+        /*
+        return new Quaternion
+        {
+            W = (cr * cp * cy + sr * sp * sy),
+            X = (sr * cp * cy - cr * sp * sy),
+            Y = (cr * sp * cy + sr * cp * sy),
+            Z = (cr * cp * sy - sr * sp * cy)
+        };
+        */
+
+        return new Quaternion
+        {
+            W = ((float)(Math.Cos(v.X * 0.5) * Math.Cos(v.Y * 0.5) * Math.Cos(v.Z * 0.5) + Math.Sin(v.X * 0.5) * Math.Sin(v.Y * 0.5) * Math.Sin(v.Z * 0.5))).FixFloat(),
+            X = ((float)(Math.Sin(v.X * 0.5) * Math.Cos(v.Y * 0.5) * Math.Cos(v.Z * 0.5) - Math.Cos(v.X * 0.5) * Math.Sin(v.Y * 0.5) * Math.Sin(v.Z * 0.5))).FixFloat(),
+            Y = ((float)(Math.Cos(v.X * 0.5) * Math.Sin(v.Y * 0.5) * Math.Cos(v.Z * 0.5) + Math.Sin(v.X * 0.5) * Math.Cos(v.Y * 0.5) * Math.Sin(v.Z * 0.5))).FixFloat(),
+            Z = ((float)(Math.Cos(v.X * 0.5) * Math.Cos(v.Y * 0.5) * Math.Sin(v.Z * 0.5) - Math.Sin(v.X * 0.5) * Math.Sin(v.Y * 0.5) * Math.Cos(v.Z * 0.5))).FixFloat()
+        };
+
+    }
+
+    public static Vector3 ToEulerAngles(this Quaternion q)
+    {
+        Vector3 angles = new();
+
+        // roll / x
+        double sinr_cosp = 2 * (q.W * q.X + q.Y * q.Z);
+        double cosr_cosp = 1 - 2 * (q.X * q.X + q.Y * q.Y);
+        angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
+
+        // pitch / y
+        double sinp = 2 * (q.W * q.Y - q.Z * q.X);
         if (Math.Abs(sinp) >= 1)
         {
-            pitch = (float)Math.CopySign(90f, sinp); // use 90 degrees if out of range
+            angles.Y = (float)Math.CopySign(Math.PI / 2, sinp);
         }
         else
         {
-            pitch = (float)((float)Math.Asin(sinp) * 180f / Math.PI);
+            angles.Y = (float)Math.Asin(sinp);
         }
 
-        double siny_cosp = 2 * (quaternion.W * quaternion.Z + quaternion.X * quaternion.Y);
-        double cosy_cosp = 1 - 2 * (quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z);
-        var yaw = (float)((float)Math.Atan2(siny_cosp, cosy_cosp) * 180f / Math.PI);
+        // yaw / z
+        double siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
+        double cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
+        angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
 
-        return new Vector3(roll, pitch, yaw);
+        angles.X *= (float)(180f / Math.PI);
+        angles.Y *= (float)(180f / Math.PI);
+        angles.Z *= (float)(180f / Math.PI);
+
+        return angles;
+    }
+
+    public static float FixFloat(this float number)
+    {
+        if (Math.Abs(number) < 1E-6f) // Check if number is close to zero
+        {
+            return 0f; // Return zero if number is close to zero
+        }
+
+        if (Math.Abs(number - 0.5)  < 1E-6f) // Check if number is close to zero
+        {
+            var amt = Math.Abs(number) - 0.5;
+            return 0.5f; // Return zero if number is close to zero
+        }
+
+        if (Math.Abs(number - (int)number) < 1E-6f) // Check if number is close to an integer
+        {
+            return (int)number; // Return the integer value if number is close to an integer
+        }
+
+        return number;
     }
 
     public static string ToBinaryString(this byte[] sBytes)
@@ -122,6 +188,29 @@ public static class ToolExt
         var a4 = reader.ReadSingle();
 
         return new Matrix4x4(r1, r2, r3, a4, r4, r5, r6, a3, r7, r8, r9, a2, t1, t2, t3, a1);
+    }
+
+    public static void WriteMatrix4X4(this BinaryWriter writer, Matrix4x4 matrix)
+    {
+        writer.Write(matrix.M11);
+        writer.Write(matrix.M12);
+        writer.Write(matrix.M13);
+        writer.Write(matrix.M41);
+
+        writer.Write(matrix.M21);
+        writer.Write(matrix.M22);
+        writer.Write(matrix.M23);
+        writer.Write(matrix.M42);
+
+        writer.Write(matrix.M31);
+        writer.Write(matrix.M32);
+        writer.Write(matrix.M33);
+        writer.Write(matrix.M43);
+
+        writer.Write(matrix.M44);
+        writer.Write(matrix.M34);
+        writer.Write(matrix.M24);
+        writer.Write(matrix.M14);
     }
 
     public static string? ReadString(this BinaryReader reader, int length, Encoding? encoding = null)

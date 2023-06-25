@@ -1,4 +1,6 @@
-﻿namespace ToolLib;
+﻿using System.Reflection.PortableExecutable;
+
+namespace ToolLib;
 
 public abstract class FileReader<T> : FileReader<T, object> where T : class
 {
