@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using CombinedActorInfo;
 using ToolLib;
 
 namespace SaveEdit
@@ -28,13 +29,13 @@ namespace SaveEdit
             var unknown2 = reader.ReadBytes(20);
 
             var currentType = DataType.Bool; // Always First One
-            var skip = new SaveFileEntry(ref reader, DataType.Bool);
+            var skip = new SaveFileEntry(ref reader, DataType.Bool, options);
             var currentCount = 0;
             var offsetStart = reader.BaseStream.Position;
 
             while (reader.BaseStream.Position < dataOffset)
             {
-                var entry = new SaveFileEntry(ref reader, currentType);
+                var entry = new SaveFileEntry(ref reader, currentType, options);
                 if (entry.Hash == 0)
                 {
                     if (options?.ShowDetails ?? false)
@@ -67,7 +68,7 @@ namespace SaveEdit
 
     public class SaveFileEntry
     {
-        public SaveFileEntry(ref BinaryReader reader, DataType type)
+        public SaveFileEntry(ref BinaryReader reader, DataType type, SaveFileOptions? options)
         {
             Hash = reader.ReadUInt32();
             var valueBytes = reader.ReadBytes(4);
@@ -133,7 +134,42 @@ namespace SaveEdit
                         Value = reader.ReadString(64, reader.ReadInt32At(Offset));
                         break;
                     case DataType.BinaryArray:
-                        Value = "TODO";
+                        reader.BaseStream.Seek(Offset, SeekOrigin.Begin);
+                        var dataCount = reader.ReadInt32();
+
+                        var dataArray = new byte[dataCount][];
+
+                        for (var j = 0; j < dataCount; j++)
+                        {
+                            var data = reader.ReadBytes(reader.ReadInt32());
+                            dataArray[j] = data;
+                        }
+
+                        Value = dataArray;
+
+                        if (Hash == 2774999734)
+                        {
+                            if (options?.SerializeAutoBuildData ?? false)
+                            {
+                                Value = dataArray.Select(a => CombinedActorInfoFile.Open(a));
+                            }
+
+                            if (!string.IsNullOrEmpty(options?.ExportAutoBuild))
+                            {
+                                try
+                                {
+                                    Directory.CreateDirectory(options.ExportAutoBuild);
+                                    for (var i = 0; i < dataArray.Length; i++)
+                                    {
+                                        File.WriteAllBytes($"{options.ExportAutoBuild}\\AutoBuild-{i}.cai", dataArray[i]);
+                                    }
+                                }
+                                catch(Exception ex)
+                                {
+                                    Console.WriteLine("Unable to export CAI files. " + ex.Message);
+                                }
+                            }
+                        }
                         break;
                     case DataType.UInt32:
                         Value = BitConverter.ToUInt32(valueBytes);
@@ -213,7 +249,21 @@ namespace SaveEdit
         /// WordFile used to apply property names to the fields. Default available <see href="https://github.com/McSpazzy/totk-gamedata/blob/master/WordList.txt">Here</see>
         /// </summary>
         public string? WordFile { get; set; }
+
+        /// <summary>
+        /// Show entry counts in console
+        /// </summary>
         public bool ShowDetails { get; set; }
+
+        /// <summary>
+        /// Convert the AutoBuild data into readable json in export
+        /// </summary>
+        public bool SerializeAutoBuildData { get; set; }
+
+        /// <summary>
+        /// Write CAI files to specified directory
+        /// </summary>
+        public string? ExportAutoBuild { get; set; }
     }
 
 }

@@ -4,6 +4,7 @@ using SkiaSharp;
 using CombinedActorInfo;
 using Newtonsoft.Json;
 using ToolLib;
+using SaveEdit;
 
 namespace TotKTools
 {
@@ -14,8 +15,22 @@ namespace TotKTools
         static void Main(string[] args)
         {
 
+            var save = File.ReadAllBytes(@"C:\Users\Andy\AppData\Roaming\yuzu\nand\user\save\0000000000000000\F9605B3AE65AAD8E1D0F4E8D2D4B2B08\0100F2C0115B6000\slot_00\progress.sav");
+
+            var saveop = new SaveFileOptions();
+
+            saveop.WordFile = @"D:\TotK-Data-Deploy\WordList.txt";
+            saveop.ShowDetails = true;
+            saveop.ExportAutoBuild = @"D:\AutoBuild-Export\";
+            saveop.SerializeAutoBuildData = true;
+
+            var saveFile = SaveFile.Open(save, saveop);
+
+            File.WriteAllText(@"d:\saveText.json", JsonConvert.SerializeObject(saveFile, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
+
+
             var fil = CombinedActorInfoFile.Open(@"D:\TotK-Data\AutoBuild\AutoBuild-20.cbi");
-            var json = JsonConvert.SerializeObject(fil.CombinedActorInfo, Formatting.Indented, new JsonSerializerSettings() {NullValueHandling = NullValueHandling.Ignore});
+            var json = JsonConvert.SerializeObject(fil.CombinedActor, Formatting.Indented, new JsonSerializerSettings() {NullValueHandling = NullValueHandling.Ignore});
             File.WriteAllText(@"d:\testOut.json", json);
 
             var test = CombinedActorInfoFile.FromFile(@"d:\testOut.json"); // Load json after modified or whatever
@@ -23,7 +38,7 @@ namespace TotKTools
 
             // Validation
             var testInputFile = CombinedActorInfoFile.Open(@"d:\newFile.cbi");
-            var json2 = JsonConvert.SerializeObject(testInputFile.CombinedActorInfo, Formatting.Indented, new JsonSerializerSettings() {NullValueHandling = NullValueHandling.Ignore});
+            var json2 = JsonConvert.SerializeObject(testInputFile.CombinedActor, Formatting.Indented, new JsonSerializerSettings() {NullValueHandling = NullValueHandling.Ignore});
             File.WriteAllText(@"d:\testOut2.json", json2); // should match the edited json
 
 

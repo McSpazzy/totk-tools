@@ -10,16 +10,16 @@ namespace CombinedActorInfo
 
     public class CombinedActorInfoFile : FileReader<CombinedActorInfoFile>
     {
-        public CombinedActorInfo CombinedActorInfo;
+        public CombinedActor CombinedActor;
 
-        public static CombinedActorInfo FromFile(string fileName)
+        public static CombinedActor FromFile(string fileName)
         {
             return FromJson(File.ReadAllText(fileName));
         }
 
-        public static CombinedActorInfo FromJson(string json)
+        public static CombinedActor FromJson(string json)
         {
-            var cai = JsonConvert.DeserializeObject<CombinedActorInfo>(json, new JsonSerializerSettings() { });
+            var cai = JsonConvert.DeserializeObject<CombinedActor>(json, new JsonSerializerSettings() { });
             cai.RebuildMatrices();
 
             return cai;
@@ -29,20 +29,20 @@ namespace CombinedActorInfo
 
         public CombinedActorInfoFile(BinaryReader reader) : base(reader)
         {
-            CombinedActorInfo = new CombinedActorInfo(reader);
+            CombinedActor = new CombinedActor(reader);
         }
     }
 
-    public class CombinedActorInfo
+    public class CombinedActor
     {
         public byte[] UnknownHeaderBytes = Array.Empty<byte>();
         public List<Actor> Actors = new List<Actor>();
         public List<float> MiscFloat = new List<float>();
         public byte[] UnknownData = Array.Empty<byte>();
 
-        public CombinedActorInfo() { }
+        public CombinedActor() { }
 
-        public CombinedActorInfo(BinaryReader reader)
+        public CombinedActor(BinaryReader reader)
         {
             var unknown1 = reader.ReadUInt16();
             var unknown2 = reader.ReadByte(); // Version?
