@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IconBuilder", "IconBuilder\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastHex", "FastHex\FastHex.csproj", "{41378086-76A0-447D-B6F3-BA600E23754A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaveEdit", "SaveEdit\SaveEdit.csproj", "{341E2700-F3EB-41AE-8F01-ED6F62D0CC3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveEdit", "SaveEdit\SaveEdit.csproj", "{341E2700-F3EB-41AE-8F01-ED6F62D0CC3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CombinedActorInfo", "CombinedActorInfo\CombinedActorInfo.csproj", "{D19E6DBB-38F6-416B-A5DD-51E76103DE78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{341E2700-F3EB-41AE-8F01-ED6F62D0CC3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{341E2700-F3EB-41AE-8F01-ED6F62D0CC3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{341E2700-F3EB-41AE-8F01-ED6F62D0CC3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D19E6DBB-38F6-416B-A5DD-51E76103DE78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D19E6DBB-38F6-416B-A5DD-51E76103DE78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D19E6DBB-38F6-416B-A5DD-51E76103DE78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D19E6DBB-38F6-416B-A5DD-51E76103DE78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -36,6 +36,36 @@ public static class ToolExt
         }
     }
 
+    public static Quaternion ToQuaternion(this Matrix4x4 matrix)
+    {
+        return Quaternion.CreateFromRotationMatrix(matrix);
+    }
+
+    public static Vector3 ToVector3(this Quaternion quaternion)
+    {
+        float pitch;
+
+        double sinr_cosp = 2 * (quaternion.W * quaternion.X + quaternion.Y * quaternion.Z);
+        double cosr_cosp = 1 - 2 * (quaternion.X * quaternion.X + quaternion.Y * quaternion.Y);
+        var roll = (float)((float)Math.Atan2(sinr_cosp, cosr_cosp) * 180f / Math.PI);
+
+        double sinp = 2 * (quaternion.W * quaternion.Y - quaternion.Z * quaternion.X);
+        if (Math.Abs(sinp) >= 1)
+        {
+            pitch = (float)Math.CopySign(90f, sinp); // use 90 degrees if out of range
+        }
+        else
+        {
+            pitch = (float)((float)Math.Asin(sinp) * 180f / Math.PI);
+        }
+
+        double siny_cosp = 2 * (quaternion.W * quaternion.Z + quaternion.X * quaternion.Y);
+        double cosy_cosp = 1 - 2 * (quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z);
+        var yaw = (float)((float)Math.Atan2(siny_cosp, cosy_cosp) * 180f / Math.PI);
+
+        return new Vector3(roll, pitch, yaw);
+    }
+
     public static string ToBinaryString(this byte[] sBytes)
     {
         return string.Join("", sBytes.Select(x => Convert.ToString(x, 2).PadLeft(8, '0')));
@@ -70,6 +100,28 @@ public static class ToolExt
     public static float[] ReadSingle(this BinaryReader reader, int count)
     {
         return Enumerable.Range(0, count).Select(i => reader.ReadSingle()).ToArray();
+    }
+
+    public static Matrix4x4 ReadMatrix4X4(this BinaryReader reader)
+    {
+        var r1 = reader.ReadSingle();
+        var r2 = reader.ReadSingle();
+        var r3 = reader.ReadSingle();
+        var t1 = reader.ReadSingle();
+        var r4 = reader.ReadSingle();
+        var r5 = reader.ReadSingle();
+        var r6 = reader.ReadSingle();
+        var t2 = reader.ReadSingle();
+        var r7 = reader.ReadSingle();
+        var r8 = reader.ReadSingle();
+        var r9 = reader.ReadSingle();
+        var t3 = reader.ReadSingle();
+        var a1 = reader.ReadSingle();
+        var a2 = reader.ReadSingle();
+        var a3 = reader.ReadSingle();
+        var a4 = reader.ReadSingle();
+
+        return new Matrix4x4(r1, r2, r3, a4, r4, r5, r6, a3, r7, r8, r9, a2, t1, t2, t3, a1);
     }
 
     public static string? ReadString(this BinaryReader reader, int length, Encoding? encoding = null)
